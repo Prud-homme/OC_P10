@@ -1,9 +1,9 @@
 from rest_framework.serializers import ModelSerializer
  
-from softdesk_api.models import Projects
+from softdesk_api.models import Project
  
-class ProjectsSerializer(ModelSerializer):
+class ProjectSerializer(ModelSerializer):
  
     class Meta:
-        model = Projects
+        model = Project
         fields = '__all__' # Prendre tous les champs
