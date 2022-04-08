@@ -15,19 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
 
-from softdesk_api.views import ProjectsAPIView, CategoryViewset
-
-# Ici nous créons notre routeur
-router = routers.SimpleRouter()
-# Puis lui déclarons une url basée sur le mot clé ‘category’ et notre view
-# afin que l’url générée soit celle que nous souhaitons ‘/api/category/’
-router.register('projects', CategoryViewset, basename='projects')#, ProjectsAPIView, basename='projects')
+from softdesk_api.views import ProjectAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     #path('api-auth/', include('rest_framework.urls')),
-    #path('projects/', ProjectsAPIView.as_view()),
-    path('', include(router.urls)) # utilisation de router autorisée ?
+    path('projects/', ProjectAPIView.as_view()),
 ]
