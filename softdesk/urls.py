@@ -19,7 +19,7 @@ from django.urls import path, include
 from softdesk_api.views import ProjectAPIView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
     #path('api-auth/', include('rest_framework.urls')),
     path('projects/', ProjectAPIView.as_view()),
 ]
