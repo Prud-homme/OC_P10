@@ -1,9 +1,9 @@
 from django.db import models
 from django.conf import settings
-from . import Project
-
+from .project import Project
 
 class Contributor(models.Model):
+	
 	# "Contributor" en fr ? 
 	CONTRIBUTOR = "CONT"
 	AUTHOR = "AUTH"

@@ -1,8 +1,9 @@
 from django.db import models
 from django.conf import settings
-from . import Issue
+from .issue import Issue
 
 class Comment(models.Model):
+	
 	# comment_id = models.IntegerField() = id dans la table
 	description = models.CharField(max_length=250)
 	author_user_id = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
