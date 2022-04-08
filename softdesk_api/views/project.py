@@ -7,6 +7,6 @@ from softdesk_api.serializers import ProjectSerializer
 class ProjectAPIView(APIView):
  
     def get(self, *args, **kwargs):
-        projects = Projects.objects.all()
-        serializer = ProjectsSerializer(projects, many=True)
+        projects = Project.objects.all()
+        serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
