@@ -111,7 +111,7 @@ AUTH_USER_MODEL = 'authentication.User'
 
 LANGUAGE_CODE = 'fr-fr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris' #'UTC'
 
 USE_I18N = True
 
