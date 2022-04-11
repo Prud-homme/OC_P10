@@ -6,4 +6,5 @@ class ProjectSerializer(ModelSerializer):
  
     class Meta:
         model = Project
-        fields = '__all__' # Prendre tous les champs
+        fields = ['id', 'title', 'description', 'project_type'] #'__all__' # Prendre tous les champs
+        #exclude = ['author_user_id']
