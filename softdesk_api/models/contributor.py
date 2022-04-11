@@ -14,7 +14,6 @@ class Contributor(models.Model):
 
 	user_id = models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	project_id = models.ForeignKey(to=Project, on_delete=models.CASCADE)
-	# Permission par défaut ?
 	permission = models.CharField(
         max_length=4,
         choices=PERMISSION_CHOICES,
