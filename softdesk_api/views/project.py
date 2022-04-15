@@ -70,6 +70,10 @@ class ProjectAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None, project_id=None):
+        """
+        If the project id is not valid, the 404 error is raised.
+        Otherwise the project is deleted by returning the status 204.
+        """
         project = get_object_or_404(Project, pk=project_id)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
