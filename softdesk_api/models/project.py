@@ -3,6 +3,9 @@ from django.conf import settings
 
 
 class Project(models.Model):
+	"""
+	A project has 5 fields: id, title, description, project_type, author_user_id.
+	"""
 	BACKEND = "BCK"
 	FRONTEND = "FRT"
 	IOS = "IOS"
