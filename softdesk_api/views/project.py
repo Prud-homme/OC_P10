@@ -37,6 +37,14 @@ class ProjectAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
+        """
+        If the user sends a valid title, description and project type,
+        the project is added to the database.
+        The project is then returned with the status 201.
+
+        If the data entered is not valid, the input errors are returned
+        with the status 400.
+        """
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author_user_id=request.user)
