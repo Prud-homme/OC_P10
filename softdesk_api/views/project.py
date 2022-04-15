@@ -15,11 +15,11 @@ class ProjectAPIView(APIView):
     permission_classes = [IsAuthenticated]
  
     def get(self, request, format=None, project_id=None):
+        projects = Project.objects.filter(author_user_id__exact=request.user.id)
         if project_id is None:
-            projects = Project.objects.filter(author_user_id__exact=request.user.id)
             serializer = ProjectSerializer(projects, many=True)
         else:
-            project = get_object_or_404(Project, pk=project_id)
+            project = get_object_or_404(projects, pk=project_id)
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
