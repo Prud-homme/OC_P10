@@ -15,6 +15,19 @@ class ProjectAPIView(APIView):
     permission_classes = [IsAuthenticated]
  
     def get(self, request, format=None, project_id=None):
+        """
+        If no project id is provided, the method returns the list
+        of all projects of the connected user with the status 200.
+        If the user is not at the origin of any project, then an
+        empty list will be returned.
+
+        If the project id is valid and this project is authored by the 
+        connected user, the project is returned with the status 200.
+
+        If the project id is valid and the connected user is not the
+        author of this project or the project id is not valid, the
+        404 error is raised.
+        """
         projects = Project.objects.filter(author_user_id__exact=request.user.id)
         if project_id is None:
             serializer = ProjectSerializer(projects, many=True)
