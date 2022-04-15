@@ -52,6 +52,16 @@ class ProjectAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None, project_id=None):
+        """
+        If the project id is not valid, the 404 error is raised.
+
+        If the user sends a valid title, description and project type,
+        the project is updated with the new data and is returned with
+        the status 200.
+
+        If the data entered is not valid, the input errors are returned
+        with the status 400.
+        """
         project = get_object_or_404(Project, pk=project_id)
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
