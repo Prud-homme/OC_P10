@@ -31,7 +31,8 @@ class ProjectAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, format=None, project_id=None):
-        project = get_object_or_404(Project, pk=project_id)
+        projects = Project.objects.filter(author_user_id__exact=request.user.id)
+        project = get_object_or_404(projects, pk=project_id)
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
             serializer.save(author_user_id=request.user)
@@ -39,6 +40,7 @@ class ProjectAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, format=None, project_id=None):
-        project = get_object_or_404(Project, pk=project_id)
+        projects = Project.objects.filter(author_user_id__exact=request.user.id)
+        project = get_object_or_404(projects, pk=project_id)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
