@@ -12,6 +12,18 @@ from softdesk_api.serializers import ProjectSerializer
 
 
 class ProjectAPIView(APIView):
+    """
+    This class allows to manage 5 endpoints linked to the CRUD operations.
+
+    Two GET endpoints to display all the projects of the connected user or
+    one of these projects with its id
+
+    a POST endpoint for the creation of a project
+
+    a PUT endpoint to update a project of the connected user
+
+    a DELETE endpoint to delete one of the connected user's projects
+    """
     permission_classes = [IsAuthenticated]
  
     def get(self, request, format=None, project_id=None):
