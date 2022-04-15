@@ -63,7 +63,7 @@ class ProjectAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, format=None, project_id=None):
+    def put(self, request, format=None, project_id=None):   
         """
         If the project id is not valid, the 404 error is raised.
 
@@ -74,7 +74,8 @@ class ProjectAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = get_object_or_404(Project, pk=project_id)
+        projects = Project.objects.filter(author_user_id__exact=request.user.id)
+        project = get_object_or_404(projects, pk=project_id)
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
             serializer.save(author_user_id=request.user)
@@ -86,6 +87,7 @@ class ProjectAPIView(APIView):
         If the project id is not valid, the 404 error is raised.
         Otherwise the project is deleted by returning the status 204.
         """
-        project = get_object_or_404(Project, pk=project_id)
+        projects = Project.objects.filter(author_user_id__exact=request.user.id)
+        project = get_object_or_404(projects, pk=project_id)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
