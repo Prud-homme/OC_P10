@@ -65,7 +65,9 @@ class ProjectAPIView(APIView):
 
     def put(self, request, format=None, project_id=None):   
         """
-        If the project id is not valid, the 404 error is raised.
+        If the project id is valid and the connected user is not the
+        author of this project or the project id is not valid, the
+        404 error is raised.
 
         If the user sends a valid title, description and project type,
         the project is updated with the new data and is returned with
@@ -84,7 +86,10 @@ class ProjectAPIView(APIView):
 
     def delete(self, request, format=None, project_id=None):
         """
-        If the project id is not valid, the 404 error is raised.
+        If the project id is valid and the connected user is not the
+        author of this project or the project id is not valid, the
+        404 error is raised.
+        
         Otherwise the project is deleted by returning the status 204.
         """
         projects = Project.objects.filter(author_user_id__exact=request.user.id)
