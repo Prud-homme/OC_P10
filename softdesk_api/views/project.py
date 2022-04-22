@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import Http404, HttpResponseBadRequest, HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse
 from rest_framework import status
 
 from django.shortcuts import get_object_or_404
- 
+
 from rest_framework.permissions import IsAuthenticated
 
 from softdesk_api.models import Project
@@ -24,16 +24,19 @@ class ProjectAPIView(APIView):
 
     a DELETE endpoint to delete one of the connected user's projects
     """
+
     permission_classes = [IsAuthenticated]
- 
-    def get(self, request: HttpRequest, format=None, project_id=None: int) -> HttpResponse:
+
+    def get(
+        self, request: HttpRequest, format=None, project_id: int = None
+    ) -> HttpResponse:
         """
         If no project id is provided, the method returns the list
         of all projects of the connected user with the status 200.
         If the user is not at the origin of any project, then an
         empty list will be returned.
 
-        If the project id is valid and this project is authored by the 
+        If the project id is valid and this project is authored by the
         connected user, the project is returned with the status 200.
 
         If the project id is valid and the connected user is not the
@@ -63,7 +66,9 @@ class ProjectAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request: HttpRequest, format=None, project_id=None: int) -> HttpResponse:   
+    def put(
+        self, request: HttpRequest, format=None, project_id: int = None
+    ) -> HttpResponse:
         """
         If the project id is valid and the connected user is not the
         author of this project or the project id is not valid, the
@@ -84,12 +89,14 @@ class ProjectAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: HttpRequest, format=None, project_id=None: int) -> HttpResponse:
+    def delete(
+        self, request: HttpRequest, format=None, project_id: int = None
+    ) -> HttpResponse:
         """
         If the project id is valid and the connected user is not the
         author of this project or the project id is not valid, the
         404 error is raised.
-        
+
         Otherwise the project is deleted by returning the status 204.
         """
         projects = Project.objects.filter(author_user_id__exact=request.user.id)

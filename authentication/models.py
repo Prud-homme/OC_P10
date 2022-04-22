@@ -4,7 +4,8 @@ from django.db import models
 
 
 class UserManager(BaseUserManager):
-    """ User Manager that knows how to create users via email instead of username """
+    """User Manager that knows how to create users via email instead of username"""
+
     def _create_user(self, email, password, **extra_fields):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
