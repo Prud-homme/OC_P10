@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404, HttpResponseBadRequest, HttpRequest, HttpResponse
 from rest_framework import status
 
 from django.shortcuts import get_object_or_404
@@ -26,7 +26,7 @@ class ProjectAPIView(APIView):
     """
     permission_classes = [IsAuthenticated]
  
-    def get(self, request, format=None, project_id=None):
+    def get(self, request: HttpRequest, format=None, project_id=None: int) -> HttpResponse:
         """
         If no project id is provided, the method returns the list
         of all projects of the connected user with the status 200.
@@ -48,7 +48,7 @@ class ProjectAPIView(APIView):
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
+    def post(self, request: HttpRequest, format=None) -> HttpResponse:
         """
         If the user sends a valid title, description and project type,
         the project is added to the database.
@@ -63,7 +63,7 @@ class ProjectAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, format=None, project_id=None):   
+    def put(self, request: HttpRequest, format=None, project_id=None: int) -> HttpResponse:   
         """
         If the project id is valid and the connected user is not the
         author of this project or the project id is not valid, the
@@ -84,7 +84,7 @@ class ProjectAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, format=None, project_id=None):
+    def delete(self, request: HttpRequest, format=None, project_id=None: int) -> HttpResponse:
         """
         If the project id is valid and the connected user is not the
         author of this project or the project id is not valid, the
