@@ -66,4 +66,3 @@ class Issue(models.Model):
         related_name="assignee_user",
     )
     created_time = models.DateTimeField(auto_now_add=True)
-
