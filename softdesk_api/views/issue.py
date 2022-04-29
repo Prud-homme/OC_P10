@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.permissions import IsAuthenticated
 
-from softdesk_api.models import Issue, Contributor
+from softdesk_api.models import Issue, Contributor, Project
 from softdesk_api.serializers import IssueSerializer
 
 
@@ -35,11 +35,14 @@ class IssueAPIView(APIView):
     ) -> HttpResponse:
         """
         If the user is not an author or contributor of the project, the status 401 is returned.
-        In case of an error on the issue id, the status 404 is returned.
+        In case of an error on the issue id or if the project does not exist,
+        the status 404 is returned.
 
         If the issue id is provided it will return the associated issue otherwise it will
         return all the issues of the project. The status 200 is returned in both cases.
         """
+        project = get_object_or_404(Project, pk=project_id)
+
         contributors = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id)
         if len(contributors) == 0:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
