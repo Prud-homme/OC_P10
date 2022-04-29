@@ -11,4 +11,4 @@ class IssueSerializer(ModelSerializer):
 
     class Meta:
         model = Issue
-        fields = ["id", "title", "description", "tag", "priority", "status", "assignee_user_id"]
+        fields = ["id", "title", "description", "tag", "priority", "status"]
