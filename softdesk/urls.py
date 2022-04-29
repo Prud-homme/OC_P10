@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from softdesk_api.views import ProjectAPIView
+from softdesk_api.views import ProjectAPIView, IssueAPIView
 
 urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -27,8 +27,8 @@ urlpatterns = [
     path('projects/<int:project_id>/', ProjectAPIView.as_view(), name='projects-details'),
     #path('projects/<int:project_id>/users/',),
     #path('projects/<int:project_id>/users/<int:user_id>/',),
-    #path('projects/<int:project_id>/issues/',),
-    #path('projects/<int:project_id>/issues/<int:issue_id>/',),
+    path('projects/<int:project_id>/issues/', IssueAPIView.as_view(), name='issues'),
+    path('projects/<int:project_id>/issues/<int:issue_id>/', IssueAPIView.as_view(), name='issues-details'),
     #path('projects/<int:project_id>/issues/<int:issue_id>/comments/',),
     #path('projects/<int:project_id>/issues/<int:issue_id>/comments/<int:comment_id>/',),
 ]

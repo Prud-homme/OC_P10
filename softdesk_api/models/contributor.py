@@ -25,3 +25,11 @@ class Contributor(models.Model):
     project_id = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     permission = models.CharField(max_length=15, choices=Permission.choices())
     role = models.CharField(max_length=100)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user_id", "project_id"],
+                name="unique_user_project"
+            )
+        ]
