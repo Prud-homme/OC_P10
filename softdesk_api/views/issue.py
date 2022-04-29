@@ -20,7 +20,8 @@ class IssueAPIView(APIView):
     """
     This class allows to manage 5 endpoints linked to the CRUD operations.
 
-    a GET endpoint to retrieve the list of issues related to a project
+    Two GET endpoint to retrieve the list of issues related to a project
+    or an issue with this id
     if the user is the author or a contributor of the project
 
     a POST endpoint to create a issue in a project
@@ -101,13 +102,12 @@ class IssueAPIView(APIView):
         self, request: HttpRequest, project_id: int, issue_id: int
     ) -> HttpResponse:
         """
-        If the project id is valid and the connected user is not the
-        author of this project or the project id is not valid, the
-        404 error is raised.
+        If the user is not author of the project, the status 403 is returned.
+        In case of an error on the issue id, assignee user id or if the project
+        does not exist, the status 404 is returned.
 
-        If the user sends a valid title, description and project type,
-        the project is updated with the new data and is returned with
-        the status 200.
+        If the user sends a valid data, the issue is updated with the new data
+        and is returned with the status 200.
 
         If the data entered is not valid, the input errors are returned
         with the status 400.
@@ -120,9 +120,9 @@ class IssueAPIView(APIView):
         if not issue:
             raise NotFound(detail='The issue id does not exists')
 
-        #author = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id, permission__exact='auteur').first()
-        #if not author:
-        #    raise PermissionDenied(detail='You must be the author of the project')
+        author = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id, permission__exact='auteur').first()
+        if not author:
+            raise PermissionDenied(detail='You must be the author of the project')
         
         assignee_user_id = request.data.get('assignee_user_id', None)
         if assignee_user_id is None:
@@ -139,16 +139,27 @@ class IssueAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(
-        self, request: HttpRequest, format=None, project_id: int = None
+        self, request: HttpRequest, project_id: int, issue_id: int
     ) -> HttpResponse:
         """
-        If the project id is valid and the connected user is not the
-        author of this project or the project id is not valid, the
-        404 error is raised.
+        If the user is not author of the project, the status 403 is returned.
+        In case of an error on the issue id or if the project does not exist,
+        the status 404 is returned.
 
-        Otherwise the project is deleted by returning the status 204.
+        Otherwise the issue is deleted by returning the status 204.
         """
-        projects = Project.objects.filter(author_user_id__exact=request.user.id)
-        project = get_object_or_404(projects, pk=project_id)
-        project.delete()
+
+        project = Project.objects.filter(pk=project_id).first()
+        if not project:
+            raise NotFound(detail='The project id does not exists')
+
+        issue = Issue.objects.filter(pk=issue_id).first()
+        if not issue:
+            raise NotFound(detail='The issue id does not exists')
+
+        author = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id, permission__exact='auteur').first()
+        if not author:
+            raise PermissionDenied(detail='You must be the author of the project')
+
+        issue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
