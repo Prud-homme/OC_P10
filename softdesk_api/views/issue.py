@@ -12,7 +12,7 @@ from softdesk_api.models import Issue, Contributor, Project
 from softdesk_api.serializers import IssueSerializer
 
 
-from softdesk_api.exceptions import ProjectNotFound, UserNotFound
+from softdesk_api.exceptions import ProjectNotFound, UserNotFound, IssueNotFound
 
 from rest_framework.exceptions import PermissionDenied
 
@@ -41,24 +41,28 @@ class IssueAPIView(APIView):
         self, request: HttpRequest, project_id: int, issue_id: int = None
     ) -> HttpResponse:
         """
-        If the user is not an author or contributor of the project, the status 401 is returned.
+        If the user is not an author or contributor of the project, the status 403 is returned.
         In case of an error on the issue id or if the project does not exist,
         the status 404 is returned.
 
         If the issue id is provided it will return the associated issue otherwise it will
         return all the issues of the project. The status 200 is returned in both cases.
         """
-        project = get_object_or_404(Project, pk=project_id)
+        project = Project.objects.filter(pk=project_id).first()
+        if not project:
+            raise ProjectNotFound
 
-        contributors = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id)
-        if len(contributors) == 0:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        contributor = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id).first()
+        if not contributor:
+            raise PermissionDenied(detail='You must be the author or a contributor of the project')
 
         issues = Issue.objects.filter(project_id__exact=project_id)
         if issue_id is None:
             serializer = IssueSerializer(issues, many=True)
         else:
-            issue = get_object_or_404(issues, pk=issue_id)
+            issue = Issue.objects.filter(pk=issue_id).first()
+            if not issue:
+                raise IssueNotFound
             serializer = IssueSerializer(issue)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
