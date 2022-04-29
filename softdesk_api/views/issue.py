@@ -12,9 +12,7 @@ from softdesk_api.models import Issue, Contributor, Project
 from softdesk_api.serializers import IssueSerializer
 
 
-from softdesk_api.exceptions import ProjectNotFound, UserNotFound, IssueNotFound
-
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, NotFound
 
 
 
@@ -50,7 +48,7 @@ class IssueAPIView(APIView):
         """
         project = Project.objects.filter(pk=project_id).first()
         if not project:
-            raise ProjectNotFound
+            raise NotFound(detail='The project id does not exists')
 
         contributor = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id).first()
         if not contributor:
@@ -62,7 +60,7 @@ class IssueAPIView(APIView):
         else:
             issue = Issue.objects.filter(pk=issue_id).first()
             if not issue:
-                raise IssueNotFound
+                raise NotFound(detail='The issue id does not exists')
             serializer = IssueSerializer(issue)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -79,7 +77,7 @@ class IssueAPIView(APIView):
         """
         project = Project.objects.filter(pk=project_id).first()
         if not project:
-            raise ProjectNotFound
+            raise NotFound(detail='The project id does not exists')
 
         assignee_user_id = request.data.get('assignee_user_id', None)
         if assignee_user_id is None:
@@ -87,7 +85,7 @@ class IssueAPIView(APIView):
         else:
             assignee_user = get_user_model().objects.filter(pk=assignee_user_id).first()
         if not assignee_user:
-            raise UserNotFound
+            raise NotFound(detail='The user id does not exists')
 
         contributor = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id).first()
         if not contributor:
@@ -99,4 +97,58 @@ class IssueAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
+    def put(
+        self, request: HttpRequest, project_id: int, issue_id: int
+    ) -> HttpResponse:
+        """
+        If the project id is valid and the connected user is not the
+        author of this project or the project id is not valid, the
+        404 error is raised.
+
+        If the user sends a valid title, description and project type,
+        the project is updated with the new data and is returned with
+        the status 200.
+
+        If the data entered is not valid, the input errors are returned
+        with the status 400.
+        """
+        project = Project.objects.filter(pk=project_id).first()
+        if not project:
+            raise NotFound(detail='The project id does not exists')
+
+        issue = Issue.objects.filter(pk=issue_id).first()
+        if not issue:
+            raise NotFound(detail='The issue id does not exists')
+
+        #author = Contributor.objects.filter(project_id__exact=project_id, user_id__exact=request.user.id, permission__exact='auteur').first()
+        #if not author:
+        #    raise PermissionDenied(detail='You must be the author of the project')
+        
+        assignee_user_id = request.data.get('assignee_user_id', None)
+        if assignee_user_id is None:
+            assignee_user = request.user
+        else:
+            assignee_user = get_user_model().objects.filter(pk=assignee_user_id).first()
+        if not assignee_user:
+            raise NotFound(detail='The user id does not exists')
+
+        serializer = IssueSerializer(issue, data=request.data)
+        if serializer.is_valid():
+            serializer.save(project_id=project, author_user_id=request.user, assignee_user_id=assignee_user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(
+        self, request: HttpRequest, format=None, project_id: int = None
+    ) -> HttpResponse:
+        """
+        If the project id is valid and the connected user is not the
+        author of this project or the project id is not valid, the
+        404 error is raised.
+
+        Otherwise the project is deleted by returning the status 204.
+        """
+        projects = Project.objects.filter(author_user_id__exact=request.user.id)
+        project = get_object_or_404(projects, pk=project_id)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
