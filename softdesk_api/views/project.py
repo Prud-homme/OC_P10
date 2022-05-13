@@ -50,6 +50,10 @@ class ProjectAPIView(APIView):
             project = Project.objects.filter(pk=project_id).first()
             if not project:
                 raise NotFound(detail="The project id does not exists")
+            elif project.author_user_id != request.user.id:
+                raise PermissionDenied(
+                    detail="You must be the author of the project"
+                )
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
