@@ -83,8 +83,13 @@ class ProjectAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        projects = Project.objects.filter(author_user_id__exact=request.user.id)
-        project = get_object_or_404(projects, pk=project_id)
+        project = Project.objects.filter(pk=project_id).first()
+        if not project:
+            raise NotFound(detail="The project id does not exists")
+        elif project.author_user_id != request.user.id:
+            raise PermissionDenied(
+                detail="You must be the author of the project"
+            )
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
             serializer.save(author_user_id=request.user)
