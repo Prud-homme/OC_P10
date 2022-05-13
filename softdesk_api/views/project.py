@@ -43,11 +43,13 @@ class ProjectAPIView(APIView):
         author of this project or the project id is not valid, the
         404 error is raised.
         """
-        projects = Project.objects.filter(author_user_id__exact=request.user.id)
         if project_id is None:
+            projects = Project.objects.filter(author_user_id__exact=request.user.id)
             serializer = ProjectSerializer(projects, many=True)
         else:
-            project = get_object_or_404(projects, pk=project_id)
+            project = Project.objects.filter(pk=project_id).first()
+            if not project:
+                raise NotFound(detail="The project id does not exists")
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
