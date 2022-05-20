@@ -1,11 +1,9 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.http import HttpRequest, HttpResponse
 from rest_framework import status
-
-from django.shortcuts import get_object_or_404
-
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from softdesk_api.models import Project
 from softdesk_api.serializers import ProjectSerializer
@@ -27,6 +25,24 @@ class ProjectAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @staticmethod
+    def search_project(request: HttpRequest, project_id: int):
+        """
+        Return the project linked to the provided id
+        if the id corresponds to a project in the database
+        and if the user who is connected is the author
+        Otherwise an error code is raised.
+
+        404: the project_id is not valid
+        403: the connected user is not the author of this project
+        """
+        project = Project.objects.filter(pk=project_id).first()
+        if not project:
+            raise NotFound(detail="The project id does not exists")
+        elif project.author_user_id != request.user.id:
+            raise PermissionDenied(detail="You must be the author of the project")
+        return project
+
     def get(
         self, request: HttpRequest, format=None, project_id: int = None
     ) -> HttpResponse:
@@ -38,16 +54,12 @@ class ProjectAPIView(APIView):
 
         If the project id is valid and this project is authored by the
         connected user, the project is returned with the status 200.
-
-        If the project id is valid and the connected user is not the
-        author of this project or the project id is not valid, the
-        404 error is raised.
         """
-        projects = Project.objects.filter(author_user_id__exact=request.user.id)
         if project_id is None:
+            projects = Project.objects.filter(author_user_id__exact=request.user.id)
             serializer = ProjectSerializer(projects, many=True)
         else:
-            project = get_object_or_404(projects, pk=project_id)
+            project = self.search_project(project_id)
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -81,8 +93,7 @@ class ProjectAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        projects = Project.objects.filter(author_user_id__exact=request.user.id)
-        project = get_object_or_404(projects, pk=project_id)
+        project = self.search_project(project_id)
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
             serializer.save(author_user_id=request.user)
@@ -99,7 +110,6 @@ class ProjectAPIView(APIView):
 
         Otherwise the project is deleted by returning the status 204.
         """
-        projects = Project.objects.filter(author_user_id__exact=request.user.id)
-        project = get_object_or_404(projects, pk=project_id)
+        project = self.search_project(project_id)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
