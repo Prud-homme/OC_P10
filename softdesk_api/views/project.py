@@ -44,7 +44,7 @@ class ProjectAPIView(APIView):
         return project
 
     def get(
-        self, request: HttpRequest, format=None, project_id: int = None
+        self, request: HttpRequest, project_id: int = None
     ) -> HttpResponse:
         """
         If no project id is provided, the method returns the list
@@ -63,7 +63,7 @@ class ProjectAPIView(APIView):
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request: HttpRequest, format=None) -> HttpResponse:
+    def post(self, request: HttpRequest) -> HttpResponse:
         """
         If the user sends a valid title, description and project type,
         the project is added to the database.
@@ -79,7 +79,7 @@ class ProjectAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(
-        self, request: HttpRequest, format=None, project_id: int = None
+        self, request: HttpRequest, project_id: int = None
     ) -> HttpResponse:
         """
         If the project id is valid and the connected user is not the
@@ -101,7 +101,7 @@ class ProjectAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(
-        self, request: HttpRequest, format=None, project_id: int = None
+        self, request: HttpRequest, project_id: int = None
     ) -> HttpResponse:
         """
         If the project id is valid and the connected user is not the
