@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
 
 class NumberValidator(object):
     def validate(self, password, user=None):
-        if not re.findall('\d', password):
+        if not re.findall('[0-9]', password):
             raise ValidationError(
                 _("The password must contain at least 1 digit, 0-9."),
                 code='password_no_number',
@@ -47,16 +47,16 @@ class LowercaseValidator(object):
 
 
 class SymbolValidator(object):
+    symbols = "!#$%&()*+,-./:;<=>?@[]^_`{|}~"
+    
     def validate(self, password, user=None):
-        if not re.findall('[()[\]{}|\\`~!@#$%^&*_\-+=;:\'",<>./?]', password):
+        if not re.findall(f'[{self.symbols}]', password):
             raise ValidationError(
-                _("The password must contain at least 1 symbol: " +
-                  "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"),
+                _(f"The password must contain at least 1 symbol: {self.symbols}"),
                 code='password_no_symbol',
             )
 
     def get_help_text(self):
         return _(
-            "Your password must contain at least 1 symbol: " +
-            "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"
+            f"Your password must contain at least 1 symbol: {self.symbols}"
         )
