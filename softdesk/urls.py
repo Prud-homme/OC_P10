@@ -17,7 +17,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from authentication.views import RegisterView, UserInformationsView
-from softdesk_api.views import ProjectAPIView, IssueAPIView, CommentAPIView
+from softdesk_api.views import ProjectAPIView, IssueAPIView, CommentAPIView, ContributorAPIView
 
 urlpatterns = [
     path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
@@ -28,8 +28,10 @@ urlpatterns = [
     path(
         "projects/<int:project_id>/", ProjectAPIView.as_view(), name="projects-details"
     ),
-    # path('projects/<int:project_id>/users/',),
-    # path('projects/<int:project_id>/users/<int:user_id>/',),
+
+    path('projects/<int:project_id>/users/', ContributorAPIView.as_view(), name='contributors-list'),
+    path('projects/<int:project_id>/users/<int:user_id>/', ContributorAPIView.as_view(), name='add-contributor'),
+    
     path("projects/<int:project_id>/issues/", IssueAPIView.as_view(), name="issues"),
     path(
         "projects/<int:project_id>/issues/<int:issue_id>/",
