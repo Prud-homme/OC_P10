@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.http import HttpRequest, HttpResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
