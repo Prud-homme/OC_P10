@@ -39,7 +39,7 @@ class ProjectAPIView(APIView):
         project = Project.objects.filter(pk=project_id).first()
         if not project:
             raise NotFound(detail="The project id does not exists")
-        elif project.author_user_id != request.user.id:
+        elif project.author_user_id != request.user:
             raise PermissionDenied(detail="You must be the author or a contributor of the project")
         return project
 
@@ -56,7 +56,7 @@ class ProjectAPIView(APIView):
         connected user, the project is returned with the status 200.
         """
         if project_id is None:
-            projects = Project.objects.filter(author_user_id__exact=request.user.id)
+            projects = Project.objects.filter(author_user_id__exact=request.user)
             serializer = ProjectSerializer(projects, many=True)
         else:
             project = self.search_project(request, project_id)
@@ -74,7 +74,7 @@ class ProjectAPIView(APIView):
         """
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(author_user_id=request.user.id)
+            serializer.save(author_user_id=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
