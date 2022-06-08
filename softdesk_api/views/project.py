@@ -94,7 +94,7 @@ class ProjectAPIView(APIView):
         with the status 400.
         """
         project = self.search_project(request, project_id)
-        serializer = ProjectSerializer(project, data=request.data)
+        serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
