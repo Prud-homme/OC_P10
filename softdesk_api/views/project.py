@@ -74,7 +74,7 @@ class ProjectAPIView(APIView):
         """
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(author_user_id=request.user)
+            serializer.save(author_user_id=request.user.id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -96,7 +96,7 @@ class ProjectAPIView(APIView):
         project = self.search_project(request, project_id)
         serializer = ProjectSerializer(project, data=request.data)
         if serializer.is_valid():
-            serializer.save(author_user_id=request.user)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
