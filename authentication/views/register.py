@@ -2,8 +2,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny
 
 from authentication.models import User
-
-from .serializers import RegisterSerializer
+from authentication.serializers import RegisterSerializer
 
 
 class RegisterView(CreateAPIView):

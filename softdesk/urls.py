@@ -16,13 +16,15 @@ Including another URLconf
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from authentication.views import RegisterView
+from authentication.views import RegisterView, UserInformationsView
 from softdesk_api.views import ProjectAPIView, IssueAPIView
 
 urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('signup/', RegisterView.as_view(), name='auth_register'),
+
+    path('account/', UserInformationsView.as_view(), name='account_info'),
 
     path('projects/', ProjectAPIView.as_view(), name='projects'),
     path('projects/<int:project_id>/', ProjectAPIView.as_view(), name='projects-details'),
