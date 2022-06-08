@@ -6,10 +6,10 @@
 
 ## Installation and execution using venv and pip
 
-⚠️ Git and Python 3.8+ must be installed first.
+⚠️ Git and Python 3.10+ must be installed first.
 
 1. Clone this repository using `$ git clone https://github.com/Prud-homme/OC_P10.git` (you can also download the code [as a zip file](https://github.com/Prud-homme/OC_P10/archive/refs/heads/main.zip))
-2. Move to the OC_P9 root folder with `$ cd OC_P10`
+2. Move to the OC_P10 root folder with `$ cd OC_P10`
 3. Create a virtual environment for the project with 
     * `$ python -m venv env` on windows
     * `$ python3 -m venv env` on macos or linux
@@ -17,7 +17,10 @@
     * `$ env\Scripts\activate` on windows
     * `$ source env/bin/activate` on macos or linux
 5. Install project dependencies with `$ pip3 install -r requirements.txt`
-6. Run the server with
+6. Initialize database with
+    * `$ python manage.py migrate` on windows
+    * `$ python3 manage.py migrate` on macos or linux
+7. Run the server with
     * `$ python manage.py runserver` on windows
     * `$ python3 manage.py runserver` on macos or linux
 
