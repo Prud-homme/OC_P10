@@ -41,7 +41,7 @@ class LowercaseValidator(object):
 
 
 class SymbolValidator(object):
-    symbols = "!#$%&()*+,-./:;<=>?@[]^_`{|}~"
+    symbols = "!#$%&()*+,-./:;<=>?@^_`{|}~"
 
     def validate(self, password, user=None):
         if not re.findall(f"[{self.symbols}]", password):
