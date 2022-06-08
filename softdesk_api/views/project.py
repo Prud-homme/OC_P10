@@ -25,24 +25,6 @@ class ProjectAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    @staticmethod
-    def search_project(request: HttpRequest, project_id: int):
-        """
-        Return the project linked to the provided id
-        if the id corresponds to a project in the database
-        and if the user who is connected is the author
-        Otherwise an error code is raised.
-
-        404: the project_id is not valid
-        403: the connected user is not the author of this project
-        """
-        project = Project.objects.filter(pk=project_id).first()
-        if not project:
-            raise NotFound(detail="The project id does not exists")
-        elif project.author_user_id != request.user:
-            raise PermissionDenied(detail="You must be the author or a contributor of the project")
-        return project
-
     def get(
         self, request: HttpRequest, project_id: int = None
     ) -> HttpResponse:
@@ -59,7 +41,7 @@ class ProjectAPIView(APIView):
             projects = Project.objects.filter(author_user_id__exact=request.user)
             serializer = ProjectSerializer(projects, many=True)
         else:
-            project = self.search_project(request, project_id)
+            project = Project.search_project(request, project_id)
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -93,7 +75,7 @@ class ProjectAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = self.search_project(request, project_id)
+        project = Project.search_project(request, project_id)
         serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -110,6 +92,6 @@ class ProjectAPIView(APIView):
 
         Otherwise the project is deleted by returning the status 204.
         """
-        project = self.search_project(request, project_id)
+        project = Project.search_project(request, project_id)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
