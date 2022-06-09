@@ -57,10 +57,10 @@ class Project(models.Model):
 
         if not project:
             raise NotFound(detail="The project id does not exists")
-        elif not contributor:
-            raise PermissionDenied(
-                detail="You must be the author or a contributor of the project"
-            )
+        # elif not contributor:
+        #     raise PermissionDenied(
+        #         detail="You must be the author or a contributor of the project"
+        #     )
         elif must_be_author and project.author_user_id != request.user:
             raise PermissionDenied(detail="You must be the author of the project")
         return project
