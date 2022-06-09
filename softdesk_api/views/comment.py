@@ -77,6 +77,13 @@ class CommentAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: HttpRequest) -> HttpResponse:
+    def delete(
+        self, request: HttpRequest, project_id: int, issue_id: int, comment_id: int
+    ) -> HttpResponse:
         """ """
-        pass
+        project = Project.search_project(request, project_id)
+        issue = Issue.search_issue(request, project, issue_id)
+        comment = Comment.search_issue(request, issue, comment_id, must_be_author=True)
+
+        comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
