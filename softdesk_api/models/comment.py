@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.conf import settings
 from django.db import models
 from django.http import HttpRequest
+from rest_framework.exceptions import NotFound, PermissionDenied
 
 
 class Comment(models.Model):
