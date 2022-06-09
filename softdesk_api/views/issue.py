@@ -107,7 +107,7 @@ class IssueAPIView(APIView):
         if not assignee_user:
             raise NotFound(detail="The user id doesn't exists and cannot be assigned")
 
-        serializer = IssueSerializer(issue, data=request.data)
+        serializer = IssueSerializer(issue, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save(
                 project_id=project,
