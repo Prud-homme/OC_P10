@@ -1,6 +1,5 @@
 from django.http import HttpRequest, HttpResponse
 from rest_framework import status
-from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,9 +24,7 @@ class ProjectAPIView(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    def get(
-        self, request: HttpRequest, project_id: int = None
-    ) -> HttpResponse:
+    def get(self, request: HttpRequest, project_id: int = None) -> HttpResponse:
         """
         If no project id is provided, the method returns the list
         of all projects of the connected user with the status 200.
@@ -60,9 +57,7 @@ class ProjectAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(
-        self, request: HttpRequest, project_id: int = None
-    ) -> HttpResponse:
+    def put(self, request: HttpRequest, project_id: int = None) -> HttpResponse:
         """
         If the project id is valid and the connected user is not the
         author of this project or the project id is not valid, the
@@ -82,9 +77,7 @@ class ProjectAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(
-        self, request: HttpRequest, project_id: int = None
-    ) -> HttpResponse:
+    def delete(self, request: HttpRequest, project_id: int = None) -> HttpResponse:
         """
         If the project id is valid and the connected user is not the
         author of this project or the project id is not valid, the

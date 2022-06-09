@@ -1,8 +1,13 @@
-from django.db import models
-from django.conf import settings
 from enum import Enum
+
+from django.conf import settings
+from django.db import models
 from django.http import HttpRequest
-    
+from rest_framework.exceptions import NotFound, PermissionDenied
+
+from softdesk_api.models.contributor import Contributor, Permission
+
+
 class ProjectType(Enum):
     """Class that defines the different types of projects"""
 
@@ -32,20 +37,36 @@ class Project(models.Model):
     )
 
     @staticmethod
-    def search_project(request: HttpRequest, project_id: int):
+    def search_project(
+        request: HttpRequest, project_id: int, must_be_author: bool = False
+    ):
         """
         Return the project linked to the provided id
-        if the id corresponds to a project in the database
-        and if the user who is connected is the author
+        if the id corresponds to a project in the database and
+        if the user who is connected is the author or a contributor
         Otherwise an error code is raised.
 
         404: the project_id is not valid
-        403: the connected user is not the author of this project
+        403: the connected user isn't the author or a contributor of this project
         """
         project = Project.objects.filter(pk=project_id).first()
+
+        contributor = Contributor.objects.filter(
+            project_id__exact=project_id, user_id__exact=request.user.id
+        ).first()
+
+        author = Contributor.objects.filter(
+            project_id__exact=project_id,
+            user_id__exact=request.user,
+            permission__exact=Permission.AUTHOR,
+        ).first()
+
         if not project:
             raise NotFound(detail="The project id does not exists")
-        elif project.author_user_id != request.user:
-            raise PermissionDenied(detail="You must be the author or a contributor of the project")
+        elif not contributor:
+            raise PermissionDenied(
+                detail="You must be the author or a contributor of the project"
+            )
+        elif must_be_author and not author:
+            raise PermissionDenied(detail="You must be the author of the project")
         return project
-
