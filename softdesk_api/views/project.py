@@ -70,7 +70,7 @@ class ProjectAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = Project.search_project(request, project_id)
+        project = Project.search_project(request, project_id, must_be_author=True)
         serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -85,6 +85,6 @@ class ProjectAPIView(APIView):
 
         Otherwise the project is deleted by returning the status 204.
         """
-        project = Project.search_project(request, project_id)
+        project = Project.search_project(request, project_id, must_be_author=True)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
