@@ -72,7 +72,7 @@ class Issue(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def search_issue(request: HttpRequest, issue_id: int, must_be_author: bool = False):
+    def search_issue(request: HttpRequest, project: Project, issue_id: int, must_be_author: bool = False):
         """
         Return the issue linked to the provided id
         if the id corresponds to a issue in the database and
@@ -86,6 +86,8 @@ class Issue(models.Model):
 
         if not issue:
             raise NotFound(detail="The issue id does not exists")
+        elif issue.project_id != project:
+            raise NotFound(detail="The issue is not part of this project")
         elif must_be_author and issue.author_user_id != request.user:
             raise PermissionDenied(detail="You must be the author of the issue")
         return issue
