@@ -32,7 +32,7 @@ class CommentAPIView(APIView):
         """ """
         pass
 
-    def put(self, request: HttpRequest) -> HttpResponse:
+    def put(self, request: HttpRequest, project_id: int, issue_id: int, comment_id: int) -> HttpResponse:
         """
         Update the comment if the project id and the issue id are valid.
         """
