@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest, HttpResponse
 from rest_framework import status
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from softdesk_api.models import Contributor, Issue, Project
+from softdesk_api.models import Issue, Project
 from softdesk_api.serializers import IssueSerializer
 
 
@@ -41,25 +41,13 @@ class IssueAPIView(APIView):
         If the issue id is provided it will return the associated issue otherwise it will
         return all the issues of the project. The status 200 is returned in both cases.
         """
-        project = Project.objects.filter(pk=project_id).first()
-        if not project:
-            raise NotFound(detail="The project id does not exists")
+        project = Project.search_project(request, project_id)
 
-        contributor = Contributor.objects.filter(
-            project_id__exact=project_id, user_id__exact=request.user.id
-        ).first()
-        if not contributor:
-            raise PermissionDenied(
-                detail="You must be the author or a contributor of the project"
-            )
-
-        issues = Issue.objects.filter(project_id__exact=project_id)
         if issue_id is None:
+            issues = Issue.objects.filter(project_id__exact=project)
             serializer = IssueSerializer(issues, many=True)
         else:
-            issue = Issue.objects.filter(pk=issue_id).first()
-            if not issue:
-                raise NotFound(detail="The issue id does not exists")
+            issue = Issue.search_issue(request, project, issue_id)
             serializer = IssueSerializer(issue)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -74,25 +62,16 @@ class IssueAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = Project.objects.filter(pk=project_id).first()
-        if not project:
-            raise NotFound(detail="The project id does not exists")
+        project = Project.search_project(request, project_id)
 
         assignee_user_id = request.data.get("assignee_user_id", None)
-        if assignee_user_id is None:
+        if not assignee_user_id:
             assignee_user = request.user
         else:
             assignee_user = get_user_model().objects.filter(pk=assignee_user_id).first()
-        if not assignee_user:
-            raise NotFound(detail="The user id does not exists")
 
-        contributor = Contributor.objects.filter(
-            project_id__exact=project_id, user_id__exact=request.user.id
-        ).first()
-        if not contributor:
-            raise PermissionDenied(
-                detail="You must be the author or a contributor of the project"
-            )
+        if not assignee_user:
+            raise NotFound(detail="The user id doesn't exists and cannot be assigned")
 
         serializer = IssueSerializer(data=request.data)
         if serializer.is_valid():
@@ -116,29 +95,17 @@ class IssueAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = Project.objects.filter(pk=project_id).first()
-        if not project:
-            raise NotFound(detail="The project id does not exists")
-
-        issue = Issue.objects.filter(pk=issue_id).first()
-        if not issue:
-            raise NotFound(detail="The issue id does not exists")
-
-        author = Contributor.objects.filter(
-            project_id__exact=project_id,
-            user_id__exact=request.user.id,
-            permission__exact="auteur",
-        ).first()
-        if not author:
-            raise PermissionDenied(detail="You must be the author of the project")
+        project = Project.search_project(request, project_id)
+        issue = Issue.search_issue(request, project, issue_id, must_be_author=True)
 
         assignee_user_id = request.data.get("assignee_user_id", None)
-        if assignee_user_id is None:
-            assignee_user = request.user
+        if not assignee_user_id:
+            assignee_user = issue.assignee_user_id
         else:
             assignee_user = get_user_model().objects.filter(pk=assignee_user_id).first()
+
         if not assignee_user:
-            raise NotFound(detail="The user id does not exists")
+            raise NotFound(detail="The user id doesn't exists and cannot be assigned")
 
         serializer = IssueSerializer(issue, data=request.data)
         if serializer.is_valid():
@@ -160,22 +127,8 @@ class IssueAPIView(APIView):
 
         Otherwise the issue is deleted by returning the status 204.
         """
-
-        project = Project.objects.filter(pk=project_id).first()
-        if not project:
-            raise NotFound(detail="The project id does not exists")
-
-        issue = Issue.objects.filter(pk=issue_id).first()
-        if not issue:
-            raise NotFound(detail="The issue id does not exists")
-
-        author = Contributor.objects.filter(
-            project_id__exact=project_id,
-            user_id__exact=request.user.id,
-            permission__exact="auteur",
-        ).first()
-        if not author:
-            raise PermissionDenied(detail="You must be the author of the project")
+        project = Project.search_project(request, project_id)
+        issue = Issue.search_issue(request, project, issue_id, must_be_author=True)
 
         issue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
