@@ -5,7 +5,7 @@ from django.db import models
 from django.http import HttpRequest
 from rest_framework.exceptions import NotFound, PermissionDenied
 
-from softdesk_api.models import Contributor
+from .contributor import Contributor
 
 
 class ProjectType(Enum):

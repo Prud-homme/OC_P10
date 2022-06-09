@@ -1,11 +1,11 @@
+from __future__ import annotations
+
 from enum import Enum
 
 from django.conf import settings
 from django.db import models
 from django.http import HttpRequest
 from rest_framework.exceptions import NotFound, PermissionDenied
-
-from .project import Project
 
 
 class Tag(Enum):
@@ -57,7 +57,7 @@ class Issue(models.Model):
     description = models.CharField(max_length=250)
     tag = models.CharField(max_length=15, choices=Tag.choices())
     priority = models.CharField(max_length=15, choices=Priority.choices())
-    project_id = models.ForeignKey(to=Project, on_delete=models.CASCADE)
+    project_id = models.ForeignKey(to="softdesk_api.Project", on_delete=models.CASCADE)
     status = models.CharField(max_length=15, choices=Status.choices())
     author_user_id = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
@@ -72,7 +72,12 @@ class Issue(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def search_issue(request: HttpRequest, project: Project, issue_id: int, must_be_author: bool = False):
+    def search_issue(
+        request: HttpRequest,
+        project: Project,
+        issue_id: int,
+        must_be_author: bool = False,
+    ):
         """
         Return the issue linked to the provided id
         if the id corresponds to a issue in the database and
