@@ -7,8 +7,8 @@ from enum import Enum
 class Permission(Enum):
     """Class that defines the different permissions"""
 
-    CONTRIBUTOR = "contributeur"
-    AUTHOR = "auteur"
+    CONTRIBUTOR = "Contributor"
+    AUTHOR = "Author"
 
     @classmethod
     def choices(cls):
