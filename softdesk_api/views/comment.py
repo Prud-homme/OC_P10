@@ -46,9 +46,20 @@ class CommentAPIView(APIView):
             serializer = CommentSerializer(comment)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request: HttpRequest) -> HttpResponse:
-        """ """
-        pass
+    def post(
+        self, request: HttpRequest, project_id: int, issue_id: int
+    ) -> HttpResponse:
+        """
+        Add the comment to the database if the information sent is valid.
+        """
+        project = Project.search_project(request, project_id)
+        issue = Issue.search_issue(request, project, issue_id)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(author_user_id=request.user, issue_id=issue)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request: HttpRequest) -> HttpResponse:
         """ """
