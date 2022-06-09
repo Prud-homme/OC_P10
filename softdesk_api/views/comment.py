@@ -42,7 +42,7 @@ class CommentAPIView(APIView):
             comments = Comment.objects.filter(issue_id__exact=issue)
             serializer = CommentSerializer(comments, many=True)
         else:
-            comment = Comment.search_issue(request, project, issue, comment_id)
+            comment = Comment.search_comment(request, issue, comment_id)
             serializer = CommentSerializer(comment)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -69,7 +69,7 @@ class CommentAPIView(APIView):
         """
         project = Project.search_project(request, project_id)
         issue = Issue.search_issue(request, project, issue_id)
-        comment = Comment.search_issue(request, issue, comment_id, must_be_author=True)
+        comment = Comment.search_comment(request, issue, comment_id, must_be_author=True)
 
         serializer = CommentSerializer(comment, data=request.data, partial=True)
         if serializer.is_valid():
@@ -85,7 +85,7 @@ class CommentAPIView(APIView):
         """ """
         project = Project.search_project(request, project_id)
         issue = Issue.search_issue(request, project, issue_id)
-        comment = Comment.search_issue(request, issue, comment_id, must_be_author=True)
+        comment = Comment.search_comment(request, issue, comment_id, must_be_author=True)
 
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
