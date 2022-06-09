@@ -5,7 +5,7 @@ from django.db import models
 from django.http import HttpRequest
 from rest_framework.exceptions import NotFound, PermissionDenied
 
-from softdesk_api.models.contributor import Contributor, Permission
+from softdesk_api.models import Contributor
 
 
 class ProjectType(Enum):
@@ -55,18 +55,12 @@ class Project(models.Model):
             project_id__exact=project_id, user_id__exact=request.user.id
         ).first()
 
-        author = Contributor.objects.filter(
-            project_id__exact=project_id,
-            user_id__exact=request.user,
-            permission__exact=Permission.AUTHOR,
-        ).first()
-
         if not project:
             raise NotFound(detail="The project id does not exists")
         elif not contributor:
             raise PermissionDenied(
                 detail="You must be the author or a contributor of the project"
             )
-        elif must_be_author and not author:
+        elif must_be_author and project.author_user_id != request.user:
             raise PermissionDenied(detail="You must be the author of the project")
         return project
