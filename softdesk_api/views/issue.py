@@ -1,12 +1,12 @@
-from django.http import HttpRequest, HttpResponse
 from django.contrib.auth import get_user_model
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.http import HttpRequest, HttpResponse
 from rest_framework import status
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied, NotFound
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from softdesk_api.models import Issue, Contributor, Project
+from softdesk_api.models import Contributor, Issue, Project
 from softdesk_api.serializers import IssueSerializer
 
 

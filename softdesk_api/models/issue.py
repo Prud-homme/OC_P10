@@ -1,7 +1,11 @@
-from django.db import models
-from django.conf import settings
-from .project import Project
 from enum import Enum
+
+from django.conf import settings
+from django.db import models
+from django.http import HttpRequest
+from rest_framework.exceptions import NotFound, PermissionDenied
+
+from .project import Project
 
 
 class Tag(Enum):
@@ -66,3 +70,22 @@ class Issue(models.Model):
         related_name="assignee_user",
     )
     created_time = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def search_issue(request: HttpRequest, issue_id: int, must_be_author: bool = False):
+        """
+        Return the issue linked to the provided id
+        if the id corresponds to a issue in the database and
+        if the user who is connected is the author or a contributor
+        Otherwise an error code is raised.
+
+        404: the issue_id is not valid
+        403: the connected user isn't the author of this issue
+        """
+        issue = Issue.objects.filter(pk=issue_id).first()
+
+        if not issue:
+            raise NotFound(detail="The issue id does not exists")
+        elif must_be_author and issue.author_user_id != request.user:
+            raise PermissionDenied(detail="You must be the author of the issue")
+        return issue
