@@ -108,10 +108,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'authentication.validators.UppercaseValidator',
     },
-    {  
+    {
         'NAME': 'authentication.validators.LowercaseValidator',
     },
-    {  
+    {
         'NAME': 'authentication.validators.SymbolValidator',
     },
 ]

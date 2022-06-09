@@ -28,10 +28,10 @@ urlpatterns = [
 
     path('projects/', ProjectAPIView.as_view(), name='projects'),
     path('projects/<int:project_id>/', ProjectAPIView.as_view(), name='projects-details'),
-    #path('projects/<int:project_id>/users/',),
-    #path('projects/<int:project_id>/users/<int:user_id>/',),
+    # path('projects/<int:project_id>/users/',),
+    # path('projects/<int:project_id>/users/<int:user_id>/',),
     path('projects/<int:project_id>/issues/', IssueAPIView.as_view(), name='issues'),
     path('projects/<int:project_id>/issues/<int:issue_id>/', IssueAPIView.as_view(), name='issues-details'),
-    #path('projects/<int:project_id>/issues/<int:issue_id>/comments/',),
-    #path('projects/<int:project_id>/issues/<int:issue_id>/comments/<int:comment_id>/',),
+    # path('projects/<int:project_id>/issues/<int:issue_id>/comments/',),
+    # path('projects/<int:project_id>/issues/<int:issue_id>/comments/<int:comment_id>/',),
 ]
