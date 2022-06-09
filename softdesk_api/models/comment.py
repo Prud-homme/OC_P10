@@ -38,4 +38,4 @@ class Comment(models.Model):
             raise NotFound(detail="The comment is not part of this issue")
         elif must_be_author and comment.author_user_id != request.user:
             raise PermissionDenied(detail="You must be the author of the comment")
-        return issue
+        return comment
