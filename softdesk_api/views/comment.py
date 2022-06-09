@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from softdesk_api.models import Comment
+from softdesk_api.models import Project, Issue, Comment
 from softdesk_api.serializers import CommentSerializer
 
 
@@ -25,21 +25,29 @@ class CommentAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        """
-        """
+        """ """
         pass
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        """
-        """
+        """ """
         pass
 
     def put(self, request: HttpRequest) -> HttpResponse:
         """
+        Update the comment if the project id and the issue id are valid.
         """
-        pass
+        project = Project.search_project(request, project_id)
+        issue = Issue.search_issue(request, project, issue_id)
+        comment = Comment.search_issue(request, issue, comment_id, must_be_author=True)
+
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(
+                issue_id=issue,
+            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request: HttpRequest) -> HttpResponse:
-        """
-        """
+        """ """
         pass
