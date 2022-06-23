@@ -4,8 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from authentication.models import User
-# from softdesk_api.models import Contributor, Project
+from softdesk_api.models import Contributor
 from softdesk_api.serializers import ContributorSerializer
 
 
@@ -13,6 +12,14 @@ class ContributorAPIView(APIView):
     """ """
 
     permission_classes = [IsAuthenticated]
+
+    def get(self, request: HttpRequest, project_id: int) -> HttpResponse:
+        """
+        Return a list of contributor for a project provided by it's id
+        """
+        contributors = Contributor.objects.filter(project_id=project_id)
+        serializer = ContributorSerializer(contributors, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request: HttpRequest, project_id: int, user_id: int) -> HttpResponse:
         """
