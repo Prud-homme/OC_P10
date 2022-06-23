@@ -5,7 +5,7 @@ from django.db import models
 from django.http import HttpRequest
 from rest_framework.exceptions import NotFound, PermissionDenied
 
-from .contributor import Contributor
+# from .contributor import Contributor
 
 
 class ProjectType(Enum):
@@ -51,9 +51,9 @@ class Project(models.Model):
         """
         project = Project.objects.filter(pk=project_id).first()
 
-        contributor = Contributor.objects.filter(
-            project_id__exact=project_id, user_id__exact=request.user.id
-        ).first()
+        # contributor = Contributor.objects.filter(
+        #     project_id__exact=project_id, user_id__exact=request.user.id
+        # ).first()
 
         if not project:
             raise NotFound(detail="The project id does not exists")

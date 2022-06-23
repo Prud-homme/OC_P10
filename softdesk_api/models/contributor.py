@@ -7,8 +7,8 @@ from django.db import models
 class Permission(Enum):
     """Class that defines the different permissions"""
 
-    CONTRIBUTOR = "Contributor"
-    AUTHOR = "Author"
+    CONTRIBUTOR = "contributor"
+    AUTHOR = "author"
 
     @classmethod
     def choices(cls):
