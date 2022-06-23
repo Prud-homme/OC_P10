@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from django.core.validators import RegexValidator
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -11,7 +12,31 @@ class RegisterSerializer(serializers.ModelSerializer):
     )
 
     password = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password]
+        write_only=True,
+        required=True,
+        validators=[
+            validate_password,
+            RegexValidator(
+                regex="[a-z]",
+                message="The password must contain at least 1 lowercase letter, a-z.",
+                code="password_no_lower",
+            ),
+            RegexValidator(
+                regex="[A-Z]",
+                message="The password must contain at least 1 uppercase letter, A-Z.",
+                code="password_no_upper",
+            ),
+            RegexValidator(
+                regex="[0-9]",
+                message="The password must contain at least 1 digit, 0-9.",
+                code="password_no_number",
+            ),
+            RegexValidator(
+                regex=r"[!#$&()*+,-./:;<=>?@[\]^_`{|}~]",
+                message="The password must contain at least 1 symbol: !#$&()*+,-./:;<=>?@[]^_`{|}~",
+                code="password_no_symbol",
+            ),
+        ],
     )
     password2 = serializers.CharField(write_only=True, required=True)
 
