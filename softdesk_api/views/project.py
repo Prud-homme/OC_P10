@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from softdesk_api.models import Project
+from softdesk_api.models import Project, Contributor
 from softdesk_api.serializers import ProjectSerializer
 
 
@@ -54,6 +54,8 @@ class ProjectAPIView(APIView):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author_user_id=request.user)
+            contributor = Contributor.objects.create(user_id=request.user, project_id= Project.objects.last(), permission="author")
+            contributor.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
