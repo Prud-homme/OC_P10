@@ -102,18 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
-    {
-        'NAME': 'authentication.validators.NumberValidator',
-    },
-    {
-        'NAME': 'authentication.validators.UppercaseValidator',
-    },
-    {
-        'NAME': 'authentication.validators.LowercaseValidator',
-    },
-    {
-        'NAME': 'authentication.validators.SymbolValidator',
-    },
 ]
 
 AUTH_USER_MODEL = "authentication.User"
