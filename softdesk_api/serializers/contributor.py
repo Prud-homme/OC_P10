@@ -2,7 +2,6 @@ from rest_framework.serializers import ModelSerializer
 
 from rest_framework.validators import UniqueTogetherValidator
 
-
 from softdesk_api.models import Contributor
 
 
