@@ -3,7 +3,9 @@ per-file-ignores =
 	# imported but unused
 	__init__.py:F401
 	# undefined name (false positive from __future__ import annotations)
+	softdesk_api/models/contributor.py:F821
 	softdesk_api/models/issue.py:F821
+	softdesk_api/models/comment.py:F821
 exclude = 
 	.git,
 	__pycache__,
