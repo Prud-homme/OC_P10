@@ -4,8 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from authentication.models import User
-from softdesk_api.models import Contributor#, Project
+from softdesk_api.models import Contributor
 from softdesk_api.serializers import ContributorSerializer
 
 
