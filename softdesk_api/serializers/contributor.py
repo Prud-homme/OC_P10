@@ -22,4 +22,3 @@ class ContributorSerializer(ModelSerializer):
                 message="The user is already attached to this project.",
             )
         ]
-

@@ -4,8 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from softdesk_api.models import Contributor
+from softdesk_api.models import Contributor, Project
 from softdesk_api.serializers import ContributorSerializer
+from authentication.models import User
 
 
 class ContributorAPIView(APIView):
@@ -43,3 +44,16 @@ class ContributorAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(
+        self, request: HttpRequest, project_id: int, user_id: int
+    ) -> HttpResponse:
+        """
+        If the user sends a valid user id and project id the contributor
+        is deleted from the database.
+        The status 204 is returned.
+        """
+        project = Project.search_project(request, project_id, must_be_author=True)
+        user = User.search_user(request, user_id)
+        contributor = Contributor.search_contributor(request, project, user)
+        contributor.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -38,7 +38,7 @@ urlpatterns = [
     path(
         "projects/<int:project_id>/users/<int:user_id>/",
         ContributorAPIView.as_view(),
-        name="add-contributor",
+        name="contributors",
     ),
     path("projects/<int:project_id>/issues/", IssueAPIView.as_view(), name="issues"),
     path(
