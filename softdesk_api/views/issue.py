@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.http import HttpRequest, HttpResponse
 from rest_framework import status
 from rest_framework.exceptions import NotFound
@@ -8,6 +7,7 @@ from rest_framework.views import APIView
 
 from softdesk_api.models import Issue, Project
 from softdesk_api.serializers import IssueSerializer
+from authentication.models import User
 
 
 class IssueAPIView(APIView):
@@ -41,13 +41,16 @@ class IssueAPIView(APIView):
         If the issue id is provided it will return the associated issue otherwise it will
         return all the issues of the project. The status 200 is returned in both cases.
         """
-        project = Project.search_project(request, project_id)
+        project = Project().get_project(project_id=project_id)
+        print(project)
+        project.is_contributor(user=request.user)
 
         if issue_id is None:
             issues = Issue.objects.filter(project_id__exact=project)
             serializer = IssueSerializer(issues, many=True)
         else:
-            issue = Issue.search_issue(request, project, issue_id)
+            issue = Issue.get_issue(issue_id=issue_id)
+            issue.is_in_project(project=project)
             serializer = IssueSerializer(issue)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -62,13 +65,14 @@ class IssueAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = Project.search_project(request, project_id)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
 
         assignee_user_id = request.data.get("assignee_user_id", None)
         if not assignee_user_id:
             assignee_user = request.user
         else:
-            assignee_user = get_user_model().objects.filter(pk=assignee_user_id).first()
+            assignee_user = User.objects.filter(pk=assignee_user_id).first()
 
         if not assignee_user:
             raise NotFound(detail="The user id doesn't exists and cannot be assigned")
@@ -95,14 +99,18 @@ class IssueAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = Project.search_project(request, project_id)
-        issue = Issue.search_issue(request, project, issue_id, must_be_author=True)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+
+        issue = Issue.get_issue(issue_id=issue_id)
+        issue.is_in_project(project=project)
+        issue.is_author(user=request.user)
 
         assignee_user_id = request.data.get("assignee_user_id", None)
         if not assignee_user_id:
             assignee_user = issue.assignee_user_id
         else:
-            assignee_user = get_user_model().objects.filter(pk=assignee_user_id).first()
+            assignee_user = User.objects.filter(pk=assignee_user_id).first()
 
         if not assignee_user:
             raise NotFound(detail="The user id doesn't exists and cannot be assigned")
@@ -127,8 +135,12 @@ class IssueAPIView(APIView):
 
         Otherwise the issue is deleted by returning the status 204.
         """
-        project = Project.search_project(request, project_id)
-        issue = Issue.search_issue(request, project, issue_id, must_be_author=True)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+
+        issue = Issue.get_issue(issue_id=issue_id)
+        issue.is_in_project(project=project)
+        issue.is_author(user=request.user)
 
         issue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
