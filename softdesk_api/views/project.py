@@ -34,13 +34,15 @@ class ProjectAPIView(APIView):
         If the project id is valid and this project is authored by the
         connected user, the project is returned with the status 200.
         """
+        
         if project_id is None:
-            projects = Project.objects.filter(author_user_id__exact=request.user)
+            contributions = Contributor.objects.filter(user_id__exact=request.user)
+            projects = [contribution.project_id for contribution in contributions]
             serializer = ProjectSerializer(projects, many=True)
         else:
             project = Project.objects.filter(pk=project_id).first()
-            Project().is_valid_project(project)
-            Project().is_contributor(request, project)
+            Project().is_valid_project(project=project)
+            project.is_contributor(user=request.user)
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -80,7 +82,7 @@ class ProjectAPIView(APIView):
         """
         project = Project.objects.filter(pk=project_id).first()
         Project().is_valid_project(project)
-        Project().is_author(request, project)
+        project.is_author(user=request.user)
 
         serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
@@ -98,7 +100,7 @@ class ProjectAPIView(APIView):
         """
         project = Project.objects.filter(pk=project_id).first()
         Project().is_valid_project(project)
-        Project().is_author(request, project)
-        
+        project.is_author(user=request.user)
+
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
