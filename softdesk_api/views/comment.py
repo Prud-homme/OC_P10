@@ -35,14 +35,18 @@ class CommentAPIView(APIView):
         Returns all the comments of a issue if no id is sent.
         Otherwise, returns the comment associated with the id if it is valid.
         """
-        project = Project.search_project(request, project_id)
-        issue = Issue.search_issue(request, project, issue_id)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+
+        issue = Issue.get_issue(issue_id=issue_id)
+        issue.is_in_project(project=project)
 
         if comment_id is None:
             comments = Comment.objects.filter(issue_id__exact=issue)
             serializer = CommentSerializer(comments, many=True)
         else:
-            comment = Comment.search_comment(request, issue, comment_id)
+            comment = Comment.get_comment(comment_id=comment_id)
+            comment.is_in_issue(issue=issue)
             serializer = CommentSerializer(comment)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -52,8 +56,11 @@ class CommentAPIView(APIView):
         """
         Add the comment to the database if the information sent is valid.
         """
-        project = Project.search_project(request, project_id)
-        issue = Issue.search_issue(request, project, issue_id)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+
+        issue = Issue.get_issue(issue_id=issue_id)
+        issue.is_in_project(project=project)
 
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
@@ -67,9 +74,15 @@ class CommentAPIView(APIView):
         """
         Update the comment if the project id and the issue id are valid.
         """
-        project = Project.search_project(request, project_id)
-        issue = Issue.search_issue(request, project, issue_id)
-        comment = Comment.search_comment(request, issue, comment_id, must_be_author=True)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+
+        issue = Issue.get_issue(issue_id=issue_id)
+        issue.is_in_project(project=project)
+
+        comment = Comment.get_comment(comment_id=comment_id)
+        comment.is_in_issue(issue=issue)
+        comment.is_author(user=request.user)
 
         serializer = CommentSerializer(comment, data=request.data, partial=True)
         if serializer.is_valid():
@@ -83,9 +96,15 @@ class CommentAPIView(APIView):
         self, request: HttpRequest, project_id: int, issue_id: int, comment_id: int
     ) -> HttpResponse:
         """ """
-        project = Project.search_project(request, project_id)
-        issue = Issue.search_issue(request, project, issue_id)
-        comment = Comment.search_comment(request, issue, comment_id, must_be_author=True)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+
+        issue = Issue.get_issue(issue_id=issue_id)
+        issue.is_in_project(project=project)
+
+        comment = Comment.get_comment(comment_id=comment_id)
+        comment.is_in_issue(issue=issue)
+        comment.is_author(user=request.user)
 
         comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
