@@ -45,29 +45,31 @@ class Project(models.Model):
         if not project:
             raise NotFound(detail="The project id does not exists")
 
-    @staticmethod
-    def is_contributor(request: HttpRequest, project: Project):
+    def is_contributor(self, user: User):#, project: Project):
         """
         Raising error if user isn't a contributor of project
         """
+        
         contributor = Contributor.objects.filter(
-            project_id__exact=project, user_id__exact=request.user
+            project_id__exact=self, user_id__exact=user
         ).first()
 
         if not contributor:
             raise PermissionDenied(
              detail="You must be the author or a contributor of the project"
             )
+        return True
 
 
-    @staticmethod
-    def is_author(request: HttpRequest, project: Project):
+    def is_author(self, user: User):#, project: Project):
         """
         Raising error if user isn't the author of project
         """
 
-        if project.author_user_id.id != request.user.id:
+        if self.author_user_id.id != user.id:
             raise PermissionDenied(detail="You must be the author of the project")
+
+
         
 
 
