@@ -4,7 +4,6 @@ from enum import Enum
 
 from django.conf import settings
 from django.db import models
-from django.http import HttpRequest
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 
@@ -72,27 +71,30 @@ class Issue(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def search_issue(
-        request: HttpRequest,
-        project: Project,
-        issue_id: int,
-        must_be_author: bool = False,
-    ):
+    def get_issue(issue_id: int)->Issue:
         """
-        Return the issue linked to the provided id
-        if the id corresponds to a issue in the database and
-        if the user who is connected is the author or a contributor
-        Otherwise an error code is raised.
-
-        404: the issue_id is not valid
-        403: the connected user isn't the author of this issue
+        Raising error if issue id doesn't exist else return issue
         """
         issue = Issue.objects.filter(pk=issue_id).first()
 
         if not issue:
             raise NotFound(detail="The issue id does not exists")
-        elif issue.project_id != project:
-            raise NotFound(detail="The issue is not part of this project")
-        elif must_be_author and issue.author_user_id != request.user:
-            raise PermissionDenied(detail="You must be the author of the issue")
+
         return issue
+
+    def is_in_project(self, project: Project)->None:
+        """
+        Raising error if issue isn't in project provided
+        """
+        
+        if self.project_id != project:
+            raise NotFound(detail="The issue is not part of this project")
+
+    def is_author(self, user:User) -> None:
+        """
+        Raising error if user provided isn't author of issue
+        """
+        
+        if self.author_user_id.id != user.id:
+            raise PermissionDenied(detail="You must be the author of the issue")
+        
