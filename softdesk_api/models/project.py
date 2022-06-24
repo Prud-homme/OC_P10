@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from enum import Enum
 
 from django.conf import settings
 from django.db import models
-from django.http import HttpRequest
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 from .contributor import Contributor
@@ -37,30 +38,34 @@ class Project(models.Model):
     )
 
     @staticmethod
-    def search_project(
-        request: HttpRequest, project_id: int, must_be_author: bool = False
-    ):
+    def get_project(project_id: int) -> Project:
         """
-        Return the project linked to the provided id
-        if the id corresponds to a project in the database and
-        if the user who is connected is the author or a contributor
-        Otherwise an error code is raised.
-
-        404: the project_id is not valid
-        403: the connected user isn't the author or a contributor of this project
+        Raising error if project doesn't exist
         """
         project = Project.objects.filter(pk=project_id).first()
-
-        contributor = Contributor.objects.filter(
-            project_id__exact=project, user_id__exact=request.user
-        ).first()
-
         if not project:
             raise NotFound(detail="The project id does not exists")
-        elif not contributor:
+        return Project
+
+    def is_contributor(self, user: User) -> Optionnal[bool]:  # noqa: F821
+        """
+        Raising error if user isn't a contributor of project
+        """
+
+        contributor = Contributor.objects.filter(
+            project_id__exact=self, user_id__exact=user
+        ).first()
+
+        if not contributor:
             raise PermissionDenied(
-             detail="You must be the author or a contributor of the project"
+                detail="You must be the author or a contributor of the project"
             )
-        elif must_be_author and project.author_user_id != request.user:
+        return True
+
+    def is_author(self, user: User) -> None:  # noqa: F821
+        """
+        Raising error if user isn't the author of project
+        """
+
+        if self.author_user_id.id != user.id:
             raise PermissionDenied(detail="You must be the author of the project")
-        return project

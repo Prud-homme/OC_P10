@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from softdesk_api.models import Project, Contributor
+from softdesk_api.models import Contributor, Project
 from softdesk_api.serializers import ProjectSerializer
 
 
@@ -34,11 +34,14 @@ class ProjectAPIView(APIView):
         If the project id is valid and this project is authored by the
         connected user, the project is returned with the status 200.
         """
+
         if project_id is None:
-            projects = Project.objects.filter(author_user_id__exact=request.user)
+            contributions = Contributor.objects.filter(user_id__exact=request.user)
+            projects = [contribution.project_id for contribution in contributions]
             serializer = ProjectSerializer(projects, many=True)
         else:
-            project = Project.search_project(request, project_id)
+            project = Project().get_project(project_id=project_id)
+            project.is_contributor(user=request.user)
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -76,7 +79,9 @@ class ProjectAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = Project.search_project(request, project_id, must_be_author=True)
+        project = Project().get_project(project_id=project_id)
+        project.is_author(user=request.user)
+
         serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -91,6 +96,8 @@ class ProjectAPIView(APIView):
 
         Otherwise the project is deleted by returning the status 204.
         """
-        project = Project.search_project(request, project_id, must_be_author=True)
+        project = Project().get_project(project_id=project_id)
+        project.is_author(user=request.user)
+
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
