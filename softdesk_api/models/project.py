@@ -38,12 +38,14 @@ class Project(models.Model):
     )
 
     @staticmethod
-    def is_valid_project(project: Project) -> None:
+    def get_project(project_id: int) -> Project:
         """
         Raising error if project doesn't exist
         """
+        project = Project.objects.filter(pk=project_id).first()
         if not project:
             raise NotFound(detail="The project id does not exists")
+        return Project
 
     def is_contributor(self, user: User) -> Optionnal[bool]:  # noqa: F821
         """
