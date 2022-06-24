@@ -1,7 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager as BaseUserManager
 from django.db import models
-from django.http import HttpRequest
 from rest_framework.exceptions import NotFound
 
 
@@ -40,7 +39,7 @@ class User(AbstractUser):
     email = models.EmailField("email address", blank=False, null=False, unique=True)
 
     @staticmethod
-    def search_user(request: HttpRequest, user_id: int):
+    def get_user(user_id: int):
         """ """
         user = User.objects.filter(pk=user_id).first()
 

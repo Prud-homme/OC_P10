@@ -35,7 +35,7 @@ class ContributorAPIView(APIView):
         """
         project = Project().get_project(project_id=project_id)
         project.is_contributor(user=request.user)
-        user = User.search_user(request, user_id)
+        user = User.get_user(request, user_id)
         data = {"project_id": project.id, "user_id": user.id, "permission": "contributor"}
         serializer = ContributorSerializer(data=data)
         if serializer.is_valid():
@@ -53,7 +53,7 @@ class ContributorAPIView(APIView):
         """
         project = Project().get_project(project_id=project_id)
         project.is_author(user=request.user)
-        user = User.search_user(request, user_id)
+        user = User.get_user(request, user_id)
         contributor = Contributor.get_contributor(project, user)
         contributor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
