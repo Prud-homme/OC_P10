@@ -71,7 +71,7 @@ class Issue(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def get_issue(issue_id: int)->Issue:
+    def get_issue(issue_id: int) -> Issue:
         """
         Raising error if issue id doesn't exist else return issue
         """
@@ -82,19 +82,18 @@ class Issue(models.Model):
 
         return issue
 
-    def is_in_project(self, project: Project)->None:
+    def is_in_project(self, project: Project) -> None:
         """
         Raising error if issue isn't in project provided
         """
-        
+
         if self.project_id != project:
             raise NotFound(detail="The issue is not part of this project")
 
-    def is_author(self, user:User) -> None:
+    def is_author(self, user: User) -> None:
         """
         Raising error if user provided isn't author of issue
         """
-        
+
         if self.author_user_id.id != user.id:
             raise PermissionDenied(detail="You must be the author of the issue")
-        
