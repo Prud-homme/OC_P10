@@ -4,7 +4,6 @@ from enum import Enum
 
 from django.conf import settings
 from django.db import models
-from django.http import HttpRequest
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 
@@ -37,21 +36,26 @@ class Contributor(models.Model):
             )
         ]
 
-    def search_contributor(request: HttpRequest, project: Project, user: User):
+    @staticmethod
+    def get_contributor(project: Project, user: User):
         """
-        Return contributor if exist in database
+        Raising error if user doesn't contribute to project else return contributor
         """
-        # from softdesk_api.models import Project
-        # from authentication.models import User
-        # project = Project.objects.filter(pk=project_id).first()
 
         contributor = Contributor.objects.filter(
             project_id__exact=project, user_id__exact=user
         ).first()
+
         if not contributor:
             raise NotFound(detail="This user for this project doesn't exists")
-        elif project.author_user_id.id == contributor.user_id.id:
+        return contributor
+
+    def is_author(self, project: Project):
+        """
+        Raising error
+        """
+
+        if project.author_user_id.id == self.user_id.id:
             raise PermissionDenied(
                 detail="You are the author of this project, you can't delete yourself"
             )
-        return contributor
