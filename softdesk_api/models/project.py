@@ -45,7 +45,7 @@ class Project(models.Model):
         project = Project.objects.filter(pk=project_id).first()
         if not project:
             raise NotFound(detail="The project id does not exists")
-        return Project
+        return project
 
     def is_contributor(self, user: User) -> Optionnal[bool]:  # noqa: F821
         """
