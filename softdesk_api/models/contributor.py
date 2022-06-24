@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum
 
 from django.conf import settings
@@ -36,13 +34,13 @@ class Contributor(models.Model):
             )
         ]
 
-    @staticmethod
-    def get_contributor(project: Project, user: User):
+    @classmethod
+    def get_contributor(cls, project: "Project", user: "User") -> "Contributor":
         """
         Raising error if user doesn't contribute to project else return contributor
         """
 
-        contributor = Contributor.objects.filter(
+        contributor = cls.objects.filter(
             project_id__exact=project, user_id__exact=user
         ).first()
 
@@ -50,7 +48,7 @@ class Contributor(models.Model):
             raise NotFound(detail="This user for this project doesn't exists")
         return contributor
 
-    def is_author(self, project: Project):
+    def is_author(self, project: "Project"):
         """
         Raising error
         """

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from django.conf import settings
 from django.db import models
 from rest_framework.exceptions import NotFound, PermissionDenied
@@ -13,18 +11,18 @@ class Comment(models.Model):
     issue_id = models.ForeignKey(to="softdesk_api.Issue", on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
 
-    @staticmethod
-    def get_comment(comment_id: int) -> Comment:
+    @classmethod
+    def get_comment(cls, comment_id: int) -> "Comment":
         """
         Raising error if comment doesn't exist else return comment
         """
-        comment = Comment.objects.filter(pk=comment_id).first()
+        comment = cls.objects.filter(pk=comment_id).first()
 
         if not comment:
             raise NotFound(detail="The comment id does not exists")
         return comment
 
-    def is_in_issue(self, issue: Issue) -> None:
+    def is_in_issue(self, issue: "Issue") -> None:
         """
         Raising error if comment doesn't in issue
         """
@@ -32,7 +30,7 @@ class Comment(models.Model):
         if self.issue_id != issue:
             raise NotFound(detail="The comment is not part of this issue")
 
-    def is_author(self, user: User) -> None:
+    def is_author(self, user: "User") -> None:
         """
         Raising error if user isn't author of comment
         """

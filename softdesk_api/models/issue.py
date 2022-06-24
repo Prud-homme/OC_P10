@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum
 
 from django.conf import settings
@@ -70,19 +68,19 @@ class Issue(models.Model):
     )
     created_time = models.DateTimeField(auto_now_add=True)
 
-    @staticmethod
-    def get_issue(issue_id: int) -> Issue:
+    @classmethod
+    def get_issue(cls, issue_id: int) -> "Issue":
         """
         Raising error if issue id doesn't exist else return issue
         """
-        issue = Issue.objects.filter(pk=issue_id).first()
+        issue = cls.objects.filter(pk=issue_id).first()
 
         if not issue:
             raise NotFound(detail="The issue id does not exists")
 
         return issue
 
-    def is_in_project(self, project: Project) -> None:
+    def is_in_project(self, project: "Project") -> None:
         """
         Raising error if issue isn't in project provided
         """
@@ -90,7 +88,7 @@ class Issue(models.Model):
         if self.project_id != project:
             raise NotFound(detail="The issue is not part of this project")
 
-    def is_author(self, user: User) -> None:
+    def is_author(self, user: "User") -> None:
         """
         Raising error if user provided isn't author of issue
         """
