@@ -12,10 +12,10 @@ class User(AbstractUser):
     username = None
     email = models.EmailField("email address", blank=False, null=False, unique=True)
 
-    @staticmethod
-    def get_user(user_id: int):
+    @classmethod
+    def get_user(cls, user_id: int) -> "User":
         """ """
-        user = User.objects.filter(pk=user_id).first()
+        user = cls.objects.filter(pk=user_id).first()
 
         if not user:
             raise NotFound(detail="The user id does not exists")
