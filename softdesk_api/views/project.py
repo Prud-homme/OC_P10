@@ -38,7 +38,9 @@ class ProjectAPIView(APIView):
             projects = Project.objects.filter(author_user_id__exact=request.user)
             serializer = ProjectSerializer(projects, many=True)
         else:
-            project = Project.search_project(request, project_id)
+            project = Project.objects.filter(pk=project_id).first()
+            Project().is_valid_project(project)
+            Project().is_contributor(request, project)
             serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -76,7 +78,10 @@ class ProjectAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        project = Project.search_project(request, project_id, must_be_author=True)
+        project = Project.objects.filter(pk=project_id).first()
+        Project().is_valid_project(project)
+        Project().is_author(request, project)
+
         serializer = ProjectSerializer(project, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -91,6 +96,9 @@ class ProjectAPIView(APIView):
 
         Otherwise the project is deleted by returning the status 204.
         """
-        project = Project.search_project(request, project_id, must_be_author=True)
+        project = Project.objects.filter(pk=project_id).first()
+        Project().is_valid_project(project)
+        Project().is_author(request, project)
+        
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
