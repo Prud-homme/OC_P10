@@ -18,7 +18,9 @@ class ContributorAPIView(APIView):
         """
         Return a list of contributor for a project provided by it's id
         """
-        contributors = Contributor.objects.filter(project_id=project_id)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+        contributors = Contributor.objects.filter(project_id=project)
         serializer = ContributorSerializer(contributors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -31,14 +33,11 @@ class ContributorAPIView(APIView):
         If the data entered is not valid, the input errors are returned
         with the status 400.
         """
-        # project = Project.search_project(request, project_id)
-        # user = User.search_user(request, user_id)
-
-        updated_request = request.POST.copy()
-        updated_request.update({"project_id": project_id, "user_id": user_id})
-        print(updated_request)
-
-        serializer = ContributorSerializer(data=updated_request)
+        project = Project().get_project(project_id=project_id)
+        project.is_contributor(user=request.user)
+        user = User.search_user(request, user_id)
+        data = {"project_id": project.id, "user_id": user.id, "permission": "contributor"}
+        serializer = ContributorSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -52,8 +51,9 @@ class ContributorAPIView(APIView):
         is deleted from the database.
         The status 204 is returned.
         """
-        project = Project.search_project(request, project_id, must_be_author=True)
+        project = Project().get_project(project_id=project_id)
+        project.is_author(user=request.user)
         user = User.search_user(request, user_id)
-        contributor = Contributor.search_contributor(request, project, user)
+        contributor = Contributor.get_contributor(project, user)
         contributor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
