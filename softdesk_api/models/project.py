@@ -32,7 +32,7 @@ class Project(models.Model):
 
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=250)
-    project_type = models.CharField(max_length=15, choices=ProjectType.choices())
+    type = models.CharField(max_length=15, choices=ProjectType.choices())
     author_user_id = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
