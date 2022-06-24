@@ -37,17 +37,17 @@ class Project(models.Model):
         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
 
-    @staticmethod
-    def get_project(project_id: int) -> Project:
+    @classmethod
+    def get_project(cls, project_id: int) -> "Project":
         """
         Raising error if project doesn't exist
         """
-        project = Project.objects.filter(pk=project_id).first()
+        project = cls.objects.filter(pk=project_id).first()
         if not project:
             raise NotFound(detail="The project id does not exists")
         return project
 
-    def is_contributor(self, user: User) -> Optionnal[bool]:  # noqa: F821
+    def is_contributor(self, user: "User") -> Optionnal[bool]:  # noqa: F821
         """
         Raising error if user isn't a contributor of project
         """
@@ -62,7 +62,7 @@ class Project(models.Model):
             )
         return True
 
-    def is_author(self, user: User) -> None:  # noqa: F821
+    def is_author(self, user: "User") -> None:  # noqa: F821
         """
         Raising error if user isn't the author of project
         """
