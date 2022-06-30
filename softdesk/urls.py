@@ -14,12 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from rest_framework_simplejwt.views import (TokenObtainPairView,
-                                            TokenRefreshView)
 
-from authentication.views import RegisterView, UserInformationsView
-from softdesk_api.views import (CommentAPIView, ContributorAPIView,
-                                IssueAPIView, ProjectAPIView)
+
+from authentication.views import (
+    RegisterView,
+    UserInformationsView,
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from softdesk_api.views import (
+    CommentAPIView,
+    ContributorAPIView,
+    IssueAPIView,
+    ProjectAPIView,
+)
 
 urlpatterns = [
     path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
