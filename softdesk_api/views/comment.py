@@ -84,7 +84,7 @@ class CommentAPIView(APIView):
         comment.is_in_issue(issue=issue)
         comment.is_author(user=request.user)
 
-        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        serializer = CommentSerializer(comment, data=request.data)
         if serializer.is_valid():
             serializer.save(
                 issue_id=issue,
