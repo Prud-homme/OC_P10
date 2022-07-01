@@ -8,7 +8,7 @@ from authentication.models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-        required=True, validators=[UniqueValidator(queryset=User.objects.all())]
+        required=True, validators=[UniqueValidator(queryset=User.objects.all(), lookup="iexact")]
     )
 
     password = serializers.CharField(
