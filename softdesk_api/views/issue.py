@@ -72,17 +72,26 @@ class IssueAPIView(APIView):
         if not assignee_user_id:
             assignee_user = request.user
         else:
-            assignee_user = User.objects.filter(pk=assignee_user_id).first()
+            assignee_user = User.get_user(assignee_user_id)
 
         if not assignee_user:
             raise NotFound(detail="The user id doesn't exists and cannot be assigned")
 
-        serializer = IssueSerializer(data=request.data)
+        data = {
+            "title": request.data.get("title"),
+            "description": request.data.get("description"),
+            "tag": request.data.get("tag"),
+            "priority": request.data.get("priority"),
+            "project_id": project,
+            "status": request.data.get("status"),
+            "assignee_user_id": assignee_user.id,
+        }
+
+        serializer = IssueSerializer(data=data)
         if serializer.is_valid():
             serializer.save(
                 project_id=project,
                 author_user_id=request.user,
-                assignee_user_id=assignee_user,
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -110,18 +119,14 @@ class IssueAPIView(APIView):
         if not assignee_user_id:
             assignee_user = issue.assignee_user_id
         else:
-            assignee_user = User.objects.filter(pk=assignee_user_id).first()
+            assignee_user = User.get_user(assignee_user_id)
 
         if not assignee_user:
             raise NotFound(detail="The user id doesn't exists and cannot be assigned")
 
         serializer = IssueSerializer(issue, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save(
-                project_id=project,
-                author_user_id=request.user,
-                assignee_user_id=assignee_user,
-            )
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
