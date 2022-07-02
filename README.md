@@ -1,6 +1,6 @@
 # SoftDesk
 
-Access to the [api documention](https://documenter.getpostman.com/view/20429363/UzJESzAG)
+Access to the [API documention](https://documenter.getpostman.com/view/20429363/UzJESzAG)
 
 ## Menu
 
