@@ -10,7 +10,15 @@ from authentication.models import User
 
 
 class ContributorAPIView(APIView):
-    """ """
+    """
+    This class allows to manage 3 endpoints.
+
+    a GET endpoint to display all the contributors of a project by providing its id
+
+    a POST endpoint to add a contributor to a project
+
+    a DELETE endpoint to remove a contributor from a project
+    """
 
     permission_classes = [IsAuthenticated]
 

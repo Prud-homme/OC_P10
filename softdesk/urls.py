@@ -18,7 +18,6 @@ from django.urls import path
 
 from authentication.views import (
     RegisterView,
-    UserInformationsView,
     TokenObtainPairView,
     TokenRefreshView,
 )
@@ -33,7 +32,6 @@ urlpatterns = [
     path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("login/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("signup/", RegisterView.as_view(), name="auth_register"),
-    path("account/", UserInformationsView.as_view(), name="account_info"),
     path("projects/", ProjectAPIView.as_view(), name="projects"),
     path(
         "projects/<int:project_id>/", ProjectAPIView.as_view(), name="projects-details"
