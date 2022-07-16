@@ -32,7 +32,7 @@ class ContributorAPIView(APIView):
         serializer = ContributorSerializer(contributors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request: HttpRequest, project_id: int, user_id: int) -> HttpResponse:
+    def post(self, request: HttpRequest, project_id: int) -> HttpResponse:
         """
         If the user sends a valid user id, project id and permission,
         the contributor is added to the database.
@@ -43,7 +43,12 @@ class ContributorAPIView(APIView):
         """
         project = Project().get_project(project_id=project_id)
         project.is_contributor(user=request.user)
+        
+        user_id = request.data.get("user_id")
         user = User.get_user(user_id)
+        if not user:
+            raise NotFound(detail="The user id doesn't exists")
+
         data = {"project_id": project.id, "user_id": user.id, "permission": "contributor"}
         serializer = ContributorSerializer(data=data)
         if serializer.is_valid():
