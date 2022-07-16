@@ -42,7 +42,6 @@ class IssueAPIView(APIView):
         return all the issues of the project. The status 200 is returned in both cases.
         """
         project = Project().get_project(project_id=project_id)
-        print(project)
         project.is_contributor(user=request.user)
 
         if issue_id is None:
